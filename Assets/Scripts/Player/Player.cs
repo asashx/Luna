@@ -19,11 +19,14 @@ public class Player : MonoBehaviour
     public bool isLanded = false;
     public float coyoteTime = 0.1f;
     public float coyoteTimeCounter = 0f;
+    public float jumpBufferTime = 0.2f;
+    public float jumpBufferTimeCounter = 0f;
 
     [Header("检测参数")]
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
     public Vector2 groundCheckOffset;
+    public Vector2 footPos;
 
     private void Awake()
     {
@@ -32,7 +35,7 @@ public class Player : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         // 触发跳跃
-        playerInput.Player.Jump.performed += Jump;
+        playerInput.Player.Jump.started += Jump;
     }
 
     private void OnEnable()
@@ -61,6 +64,7 @@ public class Player : MonoBehaviour
         Move();
         CheckGround();
         Fall();
+        JumpBuffer();
     }
 
     #region 角色移动
@@ -102,9 +106,35 @@ public class Player : MonoBehaviour
     {
         if (isLanded && (isGrounded || coyoteTimeCounter > 0))
         {
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            coyoteTimeCounter = 0;
-            isLanded = false;
+            OnJump();
+        }
+        else
+        {
+            jumpBufferTimeCounter = Time.fixedTime + jumpBufferTime;
+        }
+        
+        DrawFootPos();
+    }
+
+    private void OnJump()
+    {
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        coyoteTimeCounter = 0;
+        isLanded = false;
+        jumpBufferTimeCounter = 0;
+    }
+
+    private void DrawFootPos()
+    {
+        // 绘制角色脚下的点
+        footPos = new Vector2(transform.position.x, transform.position.y - 0.4f);
+    }
+
+    private void JumpBuffer()
+    {
+        if (jumpBufferTimeCounter > Time.fixedTime && isGrounded)
+        {
+            OnJump();
         }
     }
 
@@ -148,6 +178,7 @@ public class Player : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere((Vector2)transform.position + groundCheckOffset, groundCheckRadius);
+        Gizmos.DrawWireSphere(footPos, 0.05f);
     }
     #endregion
 }

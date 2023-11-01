@@ -167,8 +167,11 @@ MonoBehaviour:
   isLanded: 0
   coyoteTime: 0.1
   coyoteTimeCounter: 0
+  jumpBufferTime: 0.2
+  jumpBufferTimeCounter: 0
   groundCheckRadius: 0.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
   groundCheckOffset: {x: 0, y: -0.4}
+  footPos: {x: 0, y: 0}
