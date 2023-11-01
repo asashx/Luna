@@ -6,24 +6,26 @@ public class InteractiveBall : MonoBehaviour
     public enum STATE
     {   
         idle,           //围绕玩家旋转
-        chasing,        //回到玩家身边
+        chasingPlayer,        //回到玩家身边
         //chasingMouse,   //回到鼠标位置
         controlled,     //由鼠标控制
     }
 
     public GameObject player;
-    public STATE state;
+    private STATE state = STATE.controlled;
+    private bool canChangeState = true;
 
     [Header("每一帧旋转角度")]
-    public float rotateAngle = 1f;
+    public float rotateAnglePerFrame;
+    private float rotateAngle = 0f;
     [Header("旋转半径")]
-    public float rotateRadius = 0.6f;
+    public float rotateRadius;
     //[Header("正在追随的目标")]
     private ObservableValue<Vector3, InteractiveBall> target;
     //[Header("小于这个值判定为已接近")]
     private float nearDistance = 0.01f;
     [SerializeField][Header("追随速度")]
-    private float chaseSpeed = 0.015f;
+    private float chaseSpeed = 0.03f;
     private SpriteRenderer spriteRenderer;
     private void Awake()
     {
@@ -40,44 +42,84 @@ public class InteractiveBall : MonoBehaviour
                 MyRotateAround();
                 break;
             }
-            case (STATE.chasing):
-            {
-                target.Value = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
-                break;
-            }
             default:
                 break;
         }
     }
+    private void Update()
+    {
+        //按下E时，切换target
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            canChangeState = true;
+            if (state == STATE.controlled)
+                target.Value = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
+            else if(state == STATE.idle || state == STATE.chasingPlayer)
+            {
+                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                target.Value = new(mousePos.x, mousePos.y, 0f);
+            }
+        }
+    }
+    //idle状态：围绕玩家旋转
     void MyRotateAround()
     {
-        transform.RotateAround(player.transform.position, new(0, 1, 0), rotateAngle);
+        //TODO 修复旋转手感
+        //transform.RotateAround(player.transform.position, new(0, 1, 0), rotateAngle);
+        rotateAngle += rotateAnglePerFrame;
+        transform.position = new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
+            player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad));
+        //transform.SetPositionAndRotation(new(transform.position.x,player.transform.position.y,0), Quaternion.identity);
     }
-    IEnumerator ChaseTarget()
+    //chasingPlayer状态：向target移动，到达后切换到idle状态
+    IEnumerator ChasePlayer()
     {
         while(!IsNear())
         {
+            target.Value = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
             transform.position = Vector3.MoveTowards(transform.position, target.Value, chaseSpeed);
             yield return new WaitForFixedUpdate();
         }
         state = STATE.idle;
         yield break;
     }
-
+    //controlled状态：向target移动，到达后保持controlled状态
+    IEnumerator ChaseMouse()
+    {
+        transform.rotation = Quaternion.identity;
+        while (true)
+        {
+            //获取鼠标位置的世界坐标
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            target.Value = new(mousePos.x,mousePos.y,0f);
+            transform.position = Vector3.MoveTowards(transform.position, target.Value, chaseSpeed);
+            yield return new WaitForFixedUpdate();
+        }
+    }
     bool IsNear()
     {
         if ((transform.position - target.Value).magnitude <= nearDistance)
             return true;
         return false;
     }
+    //target变化时调用，并切换状态
     public void OnTargetChange()
     {
-        if(state!= STATE.chasing)
+        if(!canChangeState)
+            return;
+        StopAllCoroutines();
+        Debug.Log("Target changed ! oldState : " + state);
+        if (state == STATE.controlled)
         {
-            state = STATE.chasing;
-            StartCoroutine(nameof(ChaseTarget));
+            state = STATE.chasingPlayer;
+            StartCoroutine(nameof(ChasePlayer));
         }
-            
-        Debug.Log("Target changed to pos :" + target.Value);
+        else if(state == STATE.idle || state == STATE.chasingPlayer)
+        {
+            state = STATE.controlled;
+            StartCoroutine(nameof(ChaseMouse));
+        }
+        
+        canChangeState = false;
     }
 }

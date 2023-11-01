@@ -1354,10 +1354,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 384603029}
-  state: 0
-  rotateAngle: 6
+  rotateAnglePerFrame: 6
   rotateRadius: 0.6
-  chaseSpeed: 0.1
+  chaseSpeed: 0.15
 --- !u!58 &1586975966
 CircleCollider2D:
   m_ObjectHideFlags: 0
