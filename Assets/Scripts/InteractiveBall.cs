@@ -5,27 +5,27 @@ public class InteractiveBall : MonoBehaviour
 {
     public enum STATE
     {   
-        idle,           //围绕玩家旋转
-        chasingPlayer,        //回到玩家身边
-        //chasingMouse,   //回到鼠标位置
-        controlled,     //由鼠标控制
+        idle,               //围绕玩家旋转
+        chasingPlayer,      //回到玩家身边
+        //chasingMouse,     //回到鼠标位置
+        controlled,         //由鼠标控制
     }
 
     public GameObject player;
     private STATE state = STATE.controlled;
     private bool canChangeState = true;
 
-    [Header("每一帧旋转角度")]
-    public float rotateAnglePerFrame;
+    [SerializeField][Header("每一帧旋转角度")]
+    private float rotateAnglePerFrame;
     private float rotateAngle = 0f;
-    [Header("旋转半径")]
-    public float rotateRadius;
+    [SerializeField][Header("旋转半径")]
+    private float rotateRadius;
     //[Header("正在追随的目标")]
     private ObservableValue<Vector3, InteractiveBall> target;
     //[Header("小于这个值判定为已接近")]
     private float nearDistance = 0.01f;
     [SerializeField][Header("追随速度")]
-    private float chaseSpeed = 0.03f;
+    private float chaseSpeed;
     private SpriteRenderer spriteRenderer;
     private void Awake()
     {
@@ -64,8 +64,6 @@ public class InteractiveBall : MonoBehaviour
     //idle状态：围绕玩家旋转
     void MyRotateAround()
     {
-        //TODO 修复旋转手感
-        //transform.RotateAround(player.transform.position, new(0, 1, 0), rotateAngle);
         rotateAngle += rotateAnglePerFrame;
         transform.position = new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
             player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad));
