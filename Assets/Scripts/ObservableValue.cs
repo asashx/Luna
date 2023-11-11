@@ -54,8 +54,10 @@ public class ObservableValue<T,TCLASS>
         //    //Debug.Log("float达到数值0.2f ！！");
         //}
 
-        //if(typeof(TCLASS) == typeof(InteractiveBall))
+
         if(valueClass is InteractiveBall)
-            ((InteractiveBall)((object)valueClass)).OnTargetChange();
+            ((InteractiveBall)((object)valueClass)).OnEnterState((InteractiveBall.STATE)(object)newValue);
+
+        //refresh
     }
 }

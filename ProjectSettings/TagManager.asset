@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Trigger_Ball
+  - Ball
   layers:
   - Default
   - TransparentFX

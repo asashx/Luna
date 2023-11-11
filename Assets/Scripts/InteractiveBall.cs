@@ -1,18 +1,26 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InteractiveBall : MonoBehaviour
 {
+    public static InteractiveBall Instance { get; private set; }
+
     public enum STATE
     {   
-        idle,               //围绕玩家旋转
-        chasingPlayer,      //回到玩家身边
-        //chasingMouse,     //回到鼠标位置
-        controlled,         //由鼠标控制
+        none,                   //不移动
+        rotatingAroundPlayer,   //围绕玩家旋转
+        chasingPlayer,          //回到玩家身边的过程中
+        followingMouse,         //跟随鼠标
+
+        Idling,                 //原地待机
+        GuildingAhead,          //引领玩家前进
+        OnTrail,                //按照既定轨迹前进
     }
 
     public GameObject player;
-    private STATE state = STATE.controlled;
+    private ObservableValue<STATE,InteractiveBall> state;
+    private bool forcedByTrigger = false;
     private bool canChangeState = true;
 
     [SerializeField][Header("每一帧旋转角度")]
@@ -20,104 +28,200 @@ public class InteractiveBall : MonoBehaviour
     private float rotateAngle = 0f;
     [SerializeField][Header("旋转半径")]
     private float rotateRadius;
+
     //[Header("正在追随的目标")]
-    private ObservableValue<Vector3, InteractiveBall> target;
+    private Vector3 target;
     //[Header("小于这个值判定为已接近")]
     private float nearDistance = 0.01f;
     [SerializeField][Header("追随速度")]
     private float chaseSpeed;
-    private SpriteRenderer spriteRenderer;
+
+    private int index_lastStation = -1;
+    private List<GameObject> list_passStations = new();
     private void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        target = new(Vector3.zero, this);
-        target.Value = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
+        Instance = this;
+        state = new(STATE.followingMouse, this);
     }
-    private void FixedUpdate()
+    private void Update()
     {
-        switch(state)
+        switch (state.Value)
         {
-            case(STATE.idle):
-            {
-                MyRotateAround();
+            case (STATE.rotatingAroundPlayer):
+                Input_when_RotateAroundPlayer();
                 break;
-            }
+            case (STATE.followingMouse):
+                Input_when_FollowMouse();
+                break;
+            case STATE.chasingPlayer:
+                Input_when_ChasePlayer();
+                break;
             default:
                 break;
         }
     }
-    private void Update()
+    private void FixedUpdate()
     {
-        //按下E时，切换target
+        switch (state.Value)
+        {
+            case (STATE.rotatingAroundPlayer):
+                RotateAroundPlayer();
+                break;
+            case (STATE.followingMouse):
+                FollowMouse();
+                break;
+            case STATE.chasingPlayer:
+                ChasePlayer();
+                break;
+            case STATE.Idling:
+                Idle();
+                break;
+            case STATE.OnTrail:
+                GoOnTrail();
+                break;
+            default:
+                break;
+        }
+    }
+    void Input_when_RotateAroundPlayer()
+    {
+        if (forcedByTrigger)
+            return;
         if (Input.GetKeyDown(KeyCode.E))
         {
             canChangeState = true;
-            if (state == STATE.controlled)
-                target.Value = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
-            else if(state == STATE.idle || state == STATE.chasingPlayer)
-            {
-                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                target.Value = new(mousePos.x, mousePos.y, 0f);
-            }
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            target = new(mousePos.x, mousePos.y, 0f);
+            state.Value = STATE.followingMouse;
         }
     }
-    //idle状态：围绕玩家旋转
-    void MyRotateAround()
+    void Input_when_ChasePlayer()
+    {
+        if (forcedByTrigger)
+            return;
+        //按下E时，切换target
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            //canChangeState = true;
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            target = new(mousePos.x, mousePos.y, 0f);
+            state.Value = STATE.followingMouse;
+        }
+    }
+    void Input_when_FollowMouse()
+    {
+        if (forcedByTrigger)
+            return;
+        //按下E时，切换target
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            //canChangeState = true;
+            target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
+            state.Value = STATE.chasingPlayer;
+        }
+    }
+    void RotateAroundPlayer()
     {
         rotateAngle += rotateAnglePerFrame;
         transform.position = new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
             player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad));
-        //transform.SetPositionAndRotation(new(transform.position.x,player.transform.position.y,0), Quaternion.identity);
     }
-    //chasingPlayer状态：向target移动，到达后切换到idle状态
-    IEnumerator ChasePlayer()
+    //chasingPlayer状态：向target移动，到达后切换到rotatingAroundPlayer状态
+    void ChasePlayer()
     {
-        while(!IsNear())
-        {
-            target.Value = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
-            transform.position = Vector3.MoveTowards(transform.position, target.Value, chaseSpeed);
-            yield return new WaitForFixedUpdate();
-        }
-        state = STATE.idle;
-        yield break;
+        target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
+        if (!IsNear())
+            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        else
+            
+            state.Value = STATE.rotatingAroundPlayer;
     }
-    //controlled状态：向target移动，到达后保持controlled状态
-    IEnumerator ChaseMouse()
+    //followingMouse状态：向target移动，到达后保持followingMouse状态
+    void FollowMouse()
     {
         transform.rotation = Quaternion.identity;
-        while (true)
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        target = new(mousePos.x,mousePos.y,0f);
+        transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+    }
+    void Idle()
+    {
+        //上下浮动
+        transform.position = new Vector3(transform.position.x, transform.position.y + Mathf.Sin(Time.time) * 0.01f, transform.position.z);
+    }
+    //距离小于等于nearDistance时返回true
+    void GoOnTrail()
+    {
+        //Debug.Log(index_lastStation);
+        target = list_passStations[index_lastStation+1].transform.position;
+        if(IsNear())
         {
-            //获取鼠标位置的世界坐标
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            target.Value = new(mousePos.x,mousePos.y,0f);
-            transform.position = Vector3.MoveTowards(transform.position, target.Value, chaseSpeed);
-            yield return new WaitForFixedUpdate();
+            index_lastStation++;
+            if (index_lastStation == list_passStations.Count - 1)
+                state.Value = STATE.Idling;
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
         }
     }
     bool IsNear()
     {
-        if ((transform.position - target.Value).magnitude <= nearDistance)
+        if ((transform.position - target).magnitude <= nearDistance)
             return true;
         return false;
     }
-    //target变化时调用，并切换状态
-    public void OnTargetChange()
+
+    public bool HandleTrigger(MyTrigger myTrigger)
     {
-        if(!canChangeState)
-            return;
-        StopAllCoroutines();
-        Debug.Log("Target changed ! oldState : " + state);
-        if (state == STATE.controlled)
+        Debug.Log(myTrigger.enterType + " Enter :" + myTrigger.effectType);
+        if(myTrigger.effectType == MyTrigger.EffectType.None)
         {
-            state = STATE.chasingPlayer;
-            StartCoroutine(nameof(ChasePlayer));
+            forcedByTrigger = false;
+            return true;
         }
-        else if(state == STATE.idle || state == STATE.chasingPlayer)
+        if (myTrigger.enterType == MyTrigger.EnterType.ball && state.Value == STATE.followingMouse)
+            return false;
+        forcedByTrigger = true;
+        switch (myTrigger.effectType)
         {
-            state = STATE.controlled;
-            StartCoroutine(nameof(ChaseMouse));
+            case MyTrigger.EffectType.GuildAhead:
+                break;
+            case MyTrigger.EffectType.ChasePlayer:
+                forcedByTrigger = false;
+                state.Value = STATE.chasingPlayer;
+                break;
+            case MyTrigger.EffectType.Idle:
+                state.Value = STATE.Idling;
+                break;
+            case MyTrigger.EffectType.OnTrail:
+                if (index_lastStation != -1)
+                    list_passStations.Clear();
+                //深拷贝
+                for(int i=0;i<myTrigger.list_passStations.Count;i++)
+                {
+                    list_passStations.Add(myTrigger.list_passStations[i]);
+                }
+                //list_passStations = myTrigger.list_passStations;
+                index_lastStation = -1;
+
+                state.Value = STATE.OnTrail;
+                break;
+            default:
+                break;
         }
-        
-        canChangeState = false;
+        return true;
+    }
+    
+    public void OnEnterState(STATE state)
+    {
+        switch (state)
+        {
+            case STATE.rotatingAroundPlayer:
+                rotateAngle = 0f;
+                break;
+            default:
+                break;
+        }
     }
 }
