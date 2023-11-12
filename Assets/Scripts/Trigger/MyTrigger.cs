@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
+
 
 public class MyTrigger : MonoBehaviour
 {
@@ -13,8 +15,8 @@ public class MyTrigger : MonoBehaviour
     private bool used = false;
     public enum EnterType
     {
-        player,
-        ball,
+        Player,
+        Ball,
     };
     public EnterType enterType;
     public enum EffectType
@@ -26,27 +28,28 @@ public class MyTrigger : MonoBehaviour
         OnTrail,//按照既定轨迹前进
     }
     public EffectType effectType;
-    
+
     [Header("GuildAhead")]
     [Tooltip("离玩家的相对坐标")] public Vector2 delta_ahead;
 
-    
-    
+
+    [HideInInspector]
     public GameObject PassStations;
+    [HideInInspector]
+    /*[Tooltip("既定轨迹的中间站点")] */public List<GameObject> list_passStations;
     [Header("Ontrail")]
-    [Tooltip("既定轨迹的中间站点")] public List<GameObject> list_passStations;
-    [Tooltip("站点间的移动速度")] public List<float> list_speed;
+    [Tooltip("站点间的移动速度")]public List<float> list_passSpeed = new();
 
     
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (used)
             return;
-        if(collision.CompareTag("Player") && enterType == EnterType.player)
+        if(collision.CompareTag("Player") && enterType == EnterType.Player)
         {
             CallHandleTrigger();
         }
-        if (collision.CompareTag("Ball") && enterType == EnterType.ball)
+        if (collision.CompareTag("Ball") && enterType == EnterType.Ball)
         {
             CallHandleTrigger();
         }
@@ -55,14 +58,16 @@ public class MyTrigger : MonoBehaviour
     {
         bool whetherUse = InteractiveBall.Instance.HandleTrigger(this);
         if (usedOnce && whetherUse)
+        {
             used = true;
-        visable = !used;
+            visable = false;
+        }
         OnValidate();
     }
     private void Awake()
     {
         list_passStations.Clear();
-        for (int i=0;i< PassStations.transform.childCount;i++)
+        for (int i = 0; i < PassStations.transform.childCount; i++)
         {
             GameObject child = PassStations.transform.GetChild(i).gameObject;
             if (child.activeSelf)
@@ -72,12 +77,35 @@ public class MyTrigger : MonoBehaviour
 
     public void OnValidate()
     {
-        PassStations = gameObject.transform.Find("PassStations").gameObject;
+        #region visable
+        PassStations = transform.Find("PassStations").gameObject;
         GetComponent<SpriteRenderer>().enabled = visable;
         for (int i = 0; i < PassStations.transform.childCount; i++)
         {
             GameObject child = PassStations.transform.GetChild(i).gameObject;
             child.GetComponent<SpriteRenderer>().enabled = visable;
         }
+        #endregion
+
+        #region name
+        gameObject.name = "Trigger_" + enterType + "_"+  effectType.ToString();
+        #endregion
+
+        #region onTrail
+        if (effectType == EffectType.OnTrail)
+        {
+            PassStations.SetActive(true);
+            
+        }
+        else
+            PassStations.SetActive(false);
+        #endregion
+
+
+        //AttributeCollection collection = TypeDescriptor.GetAttributes(list_passSpeed,false);
+        //Debug.Log(collection[0]);
+        //Debug.Log(collection[1]);
+        //Debug.Log(collection[2]);
+        //Debug.Log(collection[3]);
     }
 }

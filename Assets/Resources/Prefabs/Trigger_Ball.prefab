@@ -183,7 +183,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6473018361417178832
 Transform:
   m_ObjectHideFlags: 0
@@ -215,7 +215,7 @@ GameObject:
   - component: {fileID: 3348957850525575346}
   - component: {fileID: 3210770100550401520}
   m_Layer: 0
-  m_Name: Trigger_Ball
+  m_Name: Trigger_Player_None
   m_TagString: Trigger_Ball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -347,11 +347,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visable: 1
-  triggerType: 4
+  usedOnce: 0
+  used: 0
+  enterType: 0
+  effectType: 0
   delta_ahead: {x: 0, y: 0}
   PassStations: {fileID: 4882922858299392010}
   list_passStations: []
-  list_speed: []
+  list_passSpeed: []
 --- !u!1 &8858841715535967897
 GameObject:
   m_ObjectHideFlags: 0

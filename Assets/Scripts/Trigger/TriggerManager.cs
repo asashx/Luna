@@ -8,7 +8,7 @@ public class TriggerManager : MonoBehaviour
     [Header("全部可视")]
     public bool allVisable;
     //[HideInInspector]
-    public List<MyTrigger> prefab_triggers = new();
+    public List<MyTrigger> existing_triggers = new();
     private void Awake()
     {
         Instance = this;
@@ -16,21 +16,21 @@ public class TriggerManager : MonoBehaviour
 
     void Initialize()
     {
-        prefab_triggers.Clear();
+        existing_triggers.Clear();
         for (int i=0;i<transform.childCount;i++)
         {
             if(transform.GetChild(i).GetComponent<MyTrigger>())
-                prefab_triggers.Add(transform.GetChild(i).GetComponent<MyTrigger>());
+                existing_triggers.Add(transform.GetChild(i).GetComponent<MyTrigger>());
         }
     }
 
     private void OnValidate()
     {
         Initialize();
-        for (int i = 0; i < prefab_triggers.Count; i++)
+        for (int i = 0; i < existing_triggers.Count; i++)
         {
-            prefab_triggers[i].visable = allVisable;
-            prefab_triggers[i].OnValidate();
+            existing_triggers[i].visable = allVisable;
+            existing_triggers[i].OnValidate();
         }
     }
 }

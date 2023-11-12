@@ -38,6 +38,9 @@ public class InteractiveBall : MonoBehaviour
 
     private int index_lastStation = -1;
     private List<GameObject> list_passStations = new();
+    private List<float> list_passSpeed = new();
+    private Vector2 delta_ahead;
+
     private void Awake()
     {
         Instance = this;
@@ -54,7 +57,7 @@ public class InteractiveBall : MonoBehaviour
                 Input_when_FollowMouse();
                 break;
             case STATE.chasingPlayer:
-                Input_when_ChasePlayer();
+                Input_when_RotateAroundPlayer();
                 break;
             default:
                 break;
@@ -79,6 +82,9 @@ public class InteractiveBall : MonoBehaviour
             case STATE.OnTrail:
                 GoOnTrail();
                 break;
+            case STATE.GuildingAhead:
+                GuildAhead();
+                break;
             default:
                 break;
         }
@@ -95,19 +101,19 @@ public class InteractiveBall : MonoBehaviour
             state.Value = STATE.followingMouse;
         }
     }
-    void Input_when_ChasePlayer()
-    {
-        if (forcedByTrigger)
-            return;
-        //按下E时，切换target
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            //canChangeState = true;
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            target = new(mousePos.x, mousePos.y, 0f);
-            state.Value = STATE.followingMouse;
-        }
-    }
+    //void Input_when_ChasePlayer()
+    //{
+    //    if (forcedByTrigger)
+    //        return;
+    //    //按下E时，切换target
+    //    if (Input.GetKeyDown(KeyCode.E))
+    //    {
+    //        //canChangeState = true;
+    //        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    //        target = new(mousePos.x, mousePos.y, 0f);
+    //        state.Value = STATE.followingMouse;
+    //    }
+    //}
     void Input_when_FollowMouse()
     {
         if (forcedByTrigger)
@@ -162,11 +168,23 @@ public class InteractiveBall : MonoBehaviour
         }
         else
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+            if(index_lastStation + 1 >= list_passSpeed.Count)
+                transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+            else
+                transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
         }
+    }
+    void GuildAhead()
+    {
+        target = player.transform.position + (Vector3)delta_ahead;
+        //if (IsNear())
+        //    Idle();
+        //else
+            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
     }
     bool IsNear()
     {
+
         if ((transform.position - target).magnitude <= nearDistance)
             return true;
         return false;
@@ -180,12 +198,14 @@ public class InteractiveBall : MonoBehaviour
             forcedByTrigger = false;
             return true;
         }
-        if (myTrigger.enterType == MyTrigger.EnterType.ball && state.Value == STATE.followingMouse)
+        if (myTrigger.enterType == MyTrigger.EnterType.Ball && state.Value == STATE.followingMouse)
             return false;
         forcedByTrigger = true;
         switch (myTrigger.effectType)
         {
             case MyTrigger.EffectType.GuildAhead:
+                delta_ahead = myTrigger.delta_ahead;
+                state.Value = STATE.GuildingAhead;
                 break;
             case MyTrigger.EffectType.ChasePlayer:
                 forcedByTrigger = false;
@@ -195,14 +215,17 @@ public class InteractiveBall : MonoBehaviour
                 state.Value = STATE.Idling;
                 break;
             case MyTrigger.EffectType.OnTrail:
-                if (index_lastStation != -1)
-                    list_passStations.Clear();
+                list_passStations.Clear();
                 //深拷贝
                 for(int i=0;i<myTrigger.list_passStations.Count;i++)
                 {
                     list_passStations.Add(myTrigger.list_passStations[i]);
                 }
-                //list_passStations = myTrigger.list_passStations;
+                list_passSpeed.Clear();
+                for(int i = 0; i < myTrigger.list_passSpeed.Count; i++)
+                {
+                    list_passSpeed.Add(myTrigger.list_passSpeed[i]);
+                }
                 index_lastStation = -1;
 
                 state.Value = STATE.OnTrail;
