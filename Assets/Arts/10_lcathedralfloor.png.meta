@@ -120,12 +120,99 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
+      outline:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: 26.5}
+        - {x: 26.5, y: 26.5}
+        - {x: 26.5, y: -26.5}
       physicsShape: []
       tessellationDetail: 0
       bones: []
       spriteID: 3220cce4de662f04c80db3803e50bb34
       internalID: 70639029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 10_lcathedralfloor_1
+      rect:
+        serializedVersion: 2
+        x: 324
+        y: 299
+        width: 53
+        height: 53
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: 26.5}
+        - {x: 26.5, y: -26.5}
+      physicsShape:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: 26.5}
+        - {x: 26.5, y: -26.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: dbd6f53a443dc2b4095827ec95889b2b
+      internalID: -1690685480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 10_lcathedralfloor_2
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 195
+        width: 53
+        height: 53
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: 26.5}
+        - {x: 26.5, y: -0.5}
+        - {x: 26.5, y: -26.5}
+      physicsShape:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: 26.5}
+        - {x: 26.5, y: -0.5}
+        - {x: 26.5, y: -26.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29449eb111fbc3a4fa51eb9077c63816
+      internalID: -1972434265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: 10_lcathedralfloor_3
+      rect:
+        serializedVersion: 2
+        x: 246
+        y: 195
+        width: 53
+        height: 53
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: -0.5}
+        - {x: 26.5, y: -26.5}
+      physicsShape:
+      - - {x: -26.5, y: -26.5}
+        - {x: -26.5, y: -0.5}
+        - {x: 26.5, y: -26.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: cbf370d0d1dc35c4cbae16af445afaf3
+      internalID: -308362711
       vertices: []
       indices: 
       edges: []
@@ -142,6 +229,9 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       10_lcathedralfloor_0: 70639029
+      10_lcathedralfloor_1: -1690685480
+      10_lcathedralfloor_2: -1972434265
+      10_lcathedralfloor_3: -308362711
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
