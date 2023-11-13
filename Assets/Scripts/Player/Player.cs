@@ -12,11 +12,12 @@ public class Player : MonoBehaviour
 
     [Header("角色属性")]
     public float speed = 200f;
-    public float jumpForce = 50f;
+    public float jumpForce = 15f;
 
     [Header("角色状态")]
     public bool isGrounded = false;
     public bool isLanded = false;
+    public bool isJumping = false;
     public float coyoteTime = 0.1f;
     public float coyoteTimeCounter = 0f;
     public float jumpBufferTime = 0.2f;
@@ -26,7 +27,7 @@ public class Player : MonoBehaviour
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
     public Vector2 groundCheckOffset;
-    public Vector2 footPos;
+    private Vector2 footPos;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class Player : MonoBehaviour
     {
         Move();
         CheckGround();
-        Fall();
+        // Fall();
         JumpBuffer();
     }
 
@@ -104,11 +105,17 @@ public class Player : MonoBehaviour
     #region 角色跳跃
     private void Jump(InputAction.CallbackContext ctx)
     {
-        if (isLanded && (isGrounded || coyoteTimeCounter > 0))
+        if (isLanded && isGrounded)
         {
+            Debug.Log("地面跳跃");
             OnJump();
         }
-        else
+        else if(isLanded && !isJumping && coyoteTimeCounter > 0)
+        {
+            Debug.Log("土狼跳跃");
+            OnJump();
+        }
+        else if(rb.velocity.y < 0)
         {
             jumpBufferTimeCounter = Time.fixedTime + jumpBufferTime;
         }
@@ -120,6 +127,7 @@ public class Player : MonoBehaviour
     {
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         coyoteTimeCounter = 0;
+        isJumping = true;
         isLanded = false;
         jumpBufferTimeCounter = 0;
     }
@@ -134,25 +142,22 @@ public class Player : MonoBehaviour
     {
         if (jumpBufferTimeCounter > Time.fixedTime && isGrounded)
         {
+            Debug.Log("缓冲跳跃");
             OnJump();
         }
     }
 
-    private void Fall()
-    {
-        if (rb.velocity.y < 0)
-        {
-            rb.gravityScale = 2f;
-        }
-        // else if (rb.velocity.y > 0 && !playerInput.Player.Jump.ReadValue<float>().Equals(1))
+    // private void Fall()
+    // {
+        // if (rb.velocity.y < 0)
         // {
         //     rb.gravityScale = 2f;
         // }
-        else
-        {
-            rb.gravityScale = 1f;
-        }
-    }
+        // else
+        // {
+        //     rb.gravityScale = 1f;
+        // }
+    // }
 
     private void CheckGround()
     {
@@ -167,6 +172,7 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             coyoteTimeCounter = coyoteTime;
+            isJumping = false;
         }
         else
         {

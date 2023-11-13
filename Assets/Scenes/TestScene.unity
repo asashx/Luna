@@ -268,11 +268,6 @@ MonoBehaviour:
   allVisable: 1
   existing_triggers:
   - {fileID: 1616148717}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &786323242
 GameObject:
   m_ObjectHideFlags: 0
