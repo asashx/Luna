@@ -30,5 +30,5 @@ MonoBehaviour:
   slideMaxSpeed: 8
   ledgeCheckOffset1: {x: 0, y: 0.4}
   ledgeCheckOffset2: {x: 0, y: 0.3}
-  ledgeCheckLength: 0.8
-  climbOffset: {x: 0.2, y: 0.2}
+  ledgeCheckLength: 0.4
+  climbOffset: {x: 0.5, y: 0.8}

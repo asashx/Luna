@@ -64,8 +64,8 @@ public class PlayerInAirState : PlayerState
             stateMachine.ChangeState(player.SlideState);
         }
 
-        // 空中碰到悬崖进入ledge状态
-        if (isLedge)
+        // 空中碰到悬崖进入ledge状态,在速度过快时无法抓住悬崖，具体数值未测试
+        if (isLedge &&  Mathf.Abs(player.CurrentVelocity.y) <= 5f)
         {
             stateMachine.ChangeState(player.LedgeState);
         }

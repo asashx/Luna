@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     #endregion
 
     public Vector2 CurrentVelocity { get; private set; }
+    public int FacingDirection { get; private set; } = 1;
 
     [SerializeField] 
     private PlayerData playerData;
@@ -103,10 +104,12 @@ public class Player : MonoBehaviour
         if (faceRight)
         {
             scale.x = Mathf.Abs(scale.x);
+            FacingDirection = 1;
         }
         else
         {
             scale.x = -Mathf.Abs(scale.x);
+            FacingDirection = -1;
         }
 
         transform.localScale = scale;
@@ -126,8 +129,8 @@ public class Player : MonoBehaviour
     public bool CheckLedge()
     {
         // 朝着面对的方向发射射线
-        RaycastHit2D hit1 = Physics2D.Raycast((Vector2)transform.position + playerData.ledgeCheckOffset1, transform.right * transform.localScale.x, playerData.ledgeCheckLength, playerData.groundLayer);
-        RaycastHit2D hit2 = Physics2D.Raycast((Vector2)transform.position + playerData.ledgeCheckOffset2, transform.right * transform.localScale.x, playerData.ledgeCheckLength, playerData.groundLayer);
+        RaycastHit2D hit1 = Physics2D.Raycast((Vector2)transform.position + playerData.ledgeCheckOffset1, Vector2.right * FacingDirection, playerData.ledgeCheckLength, playerData.groundLayer);
+        RaycastHit2D hit2 = Physics2D.Raycast((Vector2)transform.position + playerData.ledgeCheckOffset2, Vector2.right * FacingDirection, playerData.ledgeCheckLength, playerData.groundLayer);
         return !hit1 && hit2;
     }
     private void OnDrawGizmos()
@@ -136,11 +139,15 @@ public class Player : MonoBehaviour
         Gizmos.DrawWireSphere((Vector2)transform.position + playerData.groundCheckOffset, playerData.groundCheckRadius); // 绘制地面检测圆
         Gizmos.DrawLine(transform.position, transform.position + (Vector3)(Vector2.down * playerData.slopeCheckLength)); // 绘制斜坡检测线
         Gizmos.DrawWireSphere(jumpPressedPos, 0.05f); // 绘制跳跃按下的位置
-        Gizmos.DrawLine((Vector2)transform.position + playerData.ledgeCheckOffset1, 
-            (Vector2)transform.position + playerData.ledgeCheckOffset1 + (Vector2)(transform.right * transform.localScale.x * playerData.ledgeCheckLength)); // 绘制悬崖检测线
-        Gizmos.DrawLine((Vector2)transform.position + playerData.ledgeCheckOffset2, 
-            (Vector2)transform.position + playerData.ledgeCheckOffset2 + (Vector2)(transform.right * transform.localScale.x * playerData.ledgeCheckLength)); // 绘制悬崖检测线
+        Gizmos.DrawLine(transform.position + (Vector3)playerData.ledgeCheckOffset1, transform.position + (Vector3)(playerData.ledgeCheckOffset1 + Vector2.right * FacingDirection * playerData.ledgeCheckLength)); // 绘制悬崖检测线1
+        Gizmos.DrawLine(transform.position + (Vector3)playerData.ledgeCheckOffset2, transform.position + (Vector3)(playerData.ledgeCheckOffset2 + Vector2.right * FacingDirection * playerData.ledgeCheckLength)); // 绘制悬崖检测线2
+        
     }
+    #endregion
+
+    #region 动画触发函数
+    public void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
+    public void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
     #endregion
 
     #region 旧代码
