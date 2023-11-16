@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e93cd6bf4ad5d042976be304b0bda9c, type: 3}
+  m_Name: PlayerData
+  m_EditorClassIdentifier: 
+  moveSpeed: 6
+  acceleration: 30
+  jumpForce: 16
+  jumpBufferTime: 0.1
+  coyoteTime: 0.1
+  amountOfJumps: 1
+  groundCheckRadius: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckOffset: {x: 0, y: -0.4}
+  slopeCheckLength: 0.8
+  slopeLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  slideMaxSpeed: 8
+  ledgeCheckOffset1: {x: 0, y: 0.4}
+  ledgeCheckOffset2: {x: 0, y: 0.3}
+  ledgeCheckLength: 0.8
+  climbOffset: {x: 0.2, y: 0.2}
