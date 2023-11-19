@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e93cd6bf4ad5d042976be304b0bda9c, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  moveSpeed: 6
+  moveSpeed: 10
   acceleration: 30
-  jumpForce: 16
+  jumpForce: 20
   jumpBufferTime: 0.1
   coyoteTime: 0.1
   amountOfJumps: 1
@@ -22,13 +22,13 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  groundCheckOffset: {x: 0, y: -0.4}
-  slopeCheckLength: 0.8
+  groundCheckOffset: {x: -0.01, y: -1.51}
+  slopeCheckLength: 2.6
   slopeLayer:
     serializedVersion: 2
     m_Bits: 128
-  slideMaxSpeed: 8
-  ledgeCheckOffset1: {x: 0, y: 0.4}
-  ledgeCheckOffset2: {x: 0, y: 0.3}
-  ledgeCheckLength: 0.4
+  slideMaxSpeed: 5
+  ledgeCheckOffset1: {x: 0.77, y: 0.55}
+  ledgeCheckOffset2: {x: 0.78, y: 0.39}
+  ledgeCheckLength: 0.85
   climbOffset: {x: 0.5, y: 0.8}
