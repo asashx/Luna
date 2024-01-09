@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class MyTrigger : MonoBehaviour
 {
-    [Header("可视")]
+    [Header("??")]
     public bool visable;
 
-    [Header("是否只触发一次")]
+    [Header("???????")]
     public bool usedOnce;
-    [SerializeField][Header("是否已经触发过")]
+    [SerializeField][Header("???????")]
     private bool used = false;
     public enum EnterType
     {
@@ -21,24 +21,24 @@ public class MyTrigger : MonoBehaviour
     public EnterType enterType;
     public enum EffectType
     {
-        None,//无效果
-        GuildAhead,//引领玩家前进
-        ChasePlayer,//跟随玩家
-        Idle,//停在原地
-        OnTrail,//按照既定轨迹前进
+        None,           //???
+        GuildAhead,     //??????
+        ChasePlayer,    //????
+        Idle,           //????
+        OnTrail,        //????????
     }
     public EffectType effectType;
 
     [Header("GuildAhead")]
-    [Tooltip("离玩家的相对坐标")] public Vector2 delta_ahead;
+    [Tooltip("????????")] public Vector2 delta_ahead;
 
 
     [HideInInspector]
     public GameObject PassStations;
     [HideInInspector]
-    /*[Tooltip("既定轨迹的中间站点")] */public List<GameObject> list_passStations;
+    /*[Tooltip("?????????")] */public List<GameObject> list_passStations;
     [Header("Ontrail")]
-    [Tooltip("站点间的移动速度")]public List<float> list_passSpeed = new();
+    [Tooltip("????????")]public List<float> list_passSpeed = new();
 
     
     private void OnTriggerEnter2D(Collider2D collision)

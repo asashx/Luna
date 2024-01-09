@@ -1,11 +1,11 @@
-using System.Collections;
+锘縰sing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TriggerManager : MonoBehaviour
 {
     public static TriggerManager Instance { get; private set; }
-    [Header("全部可视")]
+    [Header("鍏ㄩ儴鍙")]
     public bool allVisable;
     //[HideInInspector]
     public List<MyTrigger> existing_triggers = new();

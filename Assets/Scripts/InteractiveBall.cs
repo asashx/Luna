@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,14 +8,14 @@ public class InteractiveBall : MonoBehaviour
 
     public enum STATE
     {   
-        none,                   //²»ÒÆ¶¯
-        rotatingAroundPlayer,   //Î§ÈÆÍæ¼ÒĞı×ª
-        chasingPlayer,          //»Øµ½Íæ¼ÒÉí±ßµÄ¹ı³ÌÖĞ
-        followingMouse,         //¸úËæÊó±ê
+        none,                   //å®Œå…¨é™æ­¢
+        rotatingAroundPlayer,   //å›´ç»•ç©å®¶æ—‹è½¬
+        chasingPlayer,          //å›åˆ°ç©å®¶èº«è¾¹çš„è¿‡ç¨‹ä¸­
+        followingMouse,         //è·Ÿéšé¼ æ ‡
 
-        Idling,                 //Ô­µØ´ı»ú
-        GuildingAhead,          //ÒıÁìÍæ¼ÒÇ°½ø
-        OnTrail,                //°´ÕÕ¼È¶¨¹ì¼£Ç°½ø
+        Idling,                 //åŸåœ°å¾…æœº
+        GuildingAhead,          //å¼•é¢†ç©å®¶å‰è¿›
+        OnTrail,                //æŒ‰ç…§æ—¢å®šè½¨è¿¹å‰è¿›
     }
 
     public GameObject player;
@@ -23,17 +23,17 @@ public class InteractiveBall : MonoBehaviour
     private bool forcedByTrigger = false;
     private bool canChangeState = true;
 
-    [SerializeField][Header("Ã¿Ò»Ö¡Ğı×ª½Ç¶È")]
+    [SerializeField][Header("æ¯ä¸€å¸§æ—‹è½¬è§’åº¦")]
     private float rotateAnglePerFrame;
     private float rotateAngle = 0f;
-    [SerializeField][Header("Ğı×ª°ë¾¶")]
+    [SerializeField][Header("æ—‹è½¬åŠå¾„")]
     private float rotateRadius;
 
-    //[Header("ÕıÔÚ×·ËæµÄÄ¿±ê")]
+    //[Header("æ­£åœ¨è¿½éšçš„ç›®æ ‡")]
     private Vector3 target;
-    //[Header("Ğ¡ÓÚÕâ¸öÖµÅĞ¶¨ÎªÒÑ½Ó½ü")]
+    //[Header("å°äºè¿™ä¸ªå€¼åˆ¤å®šä¸ºå·²æ¥è¿‘")]
     private float nearDistance = 0.01f;
-    [SerializeField][Header("×·ËæËÙ¶È")]
+    [SerializeField][Header("è¿½éšé€Ÿåº¦")]
     private float chaseSpeed;
 
     private int index_lastStation = -1;
@@ -105,7 +105,7 @@ public class InteractiveBall : MonoBehaviour
     //{
     //    if (forcedByTrigger)
     //        return;
-    //    //°´ÏÂEÊ±£¬ÇĞ»»target
+    //    //æŒ‰ä¸‹Eæ—¶ï¼Œåˆ‡æ¢target
     //    if (Input.GetKeyDown(KeyCode.E))
     //    {
     //        //canChangeState = true;
@@ -118,7 +118,7 @@ public class InteractiveBall : MonoBehaviour
     {
         if (forcedByTrigger)
             return;
-        //°´ÏÂEÊ±£¬ÇĞ»»target
+        //æŒ‰ä¸‹Eæ—¶ï¼Œåˆ‡æ¢target
         if (Input.GetKeyDown(KeyCode.E))
         {
             //canChangeState = true;
@@ -132,7 +132,7 @@ public class InteractiveBall : MonoBehaviour
         transform.position = new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
             player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad));
     }
-    //chasingPlayer×´Ì¬£ºÏòtargetÒÆ¶¯£¬µ½´ïºóÇĞ»»µ½rotatingAroundPlayer×´Ì¬
+    //chasingPlayerçŠ¶æ€ï¼šå‘targetç§»åŠ¨ï¼Œåˆ°è¾¾ååˆ‡æ¢åˆ°rotatingAroundPlayerçŠ¶æ€
     void ChasePlayer()
     {
         target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
@@ -142,7 +142,7 @@ public class InteractiveBall : MonoBehaviour
             
             state.Value = STATE.rotatingAroundPlayer;
     }
-    //followingMouse×´Ì¬£ºÏòtargetÒÆ¶¯£¬µ½´ïºó±£³ÖfollowingMouse×´Ì¬
+    //followingMouseÃ—Â´ÃŒÂ¬Â£ÂºÃÃ²targetÃ’Ã†Â¶Â¯Â£Â¬ÂµÂ½Â´Ã¯ÂºÃ³Â±Â£Â³Ã–followingMouseÃ—Â´ÃŒÂ¬
     void FollowMouse()
     {
         transform.rotation = Quaternion.identity;
@@ -152,10 +152,10 @@ public class InteractiveBall : MonoBehaviour
     }
     void Idle()
     {
-        //ÉÏÏÂ¸¡¶¯
+        //ä¸Šä¸‹æµ®åŠ¨
         transform.position = new Vector3(transform.position.x, transform.position.y + Mathf.Sin(Time.time) * 0.01f, transform.position.z);
     }
-    //¾àÀëĞ¡ÓÚµÈÓÚnearDistanceÊ±·µ»Øtrue
+    //è·ç¦»å°äºç­‰äºnearDistanceæ—¶è¿”å›true
     void GoOnTrail()
     {
         //Debug.Log(index_lastStation);
@@ -216,8 +216,8 @@ public class InteractiveBall : MonoBehaviour
                 break;
             case MyTrigger.EffectType.OnTrail:
                 list_passStations.Clear();
-                //Éî¿½±´
-                for(int i=0;i<myTrigger.list_passStations.Count;i++)
+                //æ·±æ‹·è´
+                for (int i=0;i<myTrigger.list_passStations.Count;i++)
                 {
                     list_passStations.Add(myTrigger.list_passStations[i]);
                 }
