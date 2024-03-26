@@ -3359,8 +3359,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 4.164034, y: 3.2179751, z: 0}
-    m_Extent: {x: 8.413763, y: 5.5317564, z: 0}
+    m_Center: {x: 4.164034, y: 3.217976, z: 0}
+    m_Extent: {x: 8.413763, y: 5.531755, z: 0}
   m_SpriteSortPoint: 0
 --- !u!1 &1045133455
 GameObject:
@@ -5127,8 +5127,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 4.164034, y: 3.2179751, z: 0}
-    m_Extent: {x: 8.413763, y: 5.5317564, z: 0}
+    m_Center: {x: 4.164034, y: 3.217976, z: 0}
+    m_Extent: {x: 8.413763, y: 5.531755, z: 0}
   m_SpriteSortPoint: 0
 --- !u!1 &1087749632
 GameObject:
@@ -5877,8 +5877,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 4.164034, y: 3.2179751, z: 0}
-    m_Extent: {x: 8.413763, y: 5.5317564, z: 0}
+    m_Center: {x: 4.164034, y: 3.217976, z: 0}
+    m_Extent: {x: 8.413763, y: 5.531755, z: 0}
   m_SpriteSortPoint: 0
 --- !u!1 &1258160745
 GameObject:
@@ -6178,8 +6178,8 @@ MonoBehaviour:
   m_StreamingVersion: 20170927
   m_Priority: 10
   m_StandbyUpdate: 2
-  m_LookAt: {fileID: 0}
-  m_Follow: {fileID: 0}
+  m_LookAt: {fileID: 384603037}
+  m_Follow: {fileID: 384603037}
   m_Lens:
     FieldOfView: 60
     OrthographicSize: 10
@@ -6208,7 +6208,7 @@ Transform:
   m_GameObject: {fileID: 1437475871}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1111, y: 14, z: -160.30771}
+  m_LocalPosition: {x: -31.6, y: -1.8, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6567,6 +6567,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 384603029}
+  forcedByTrigger: 0
   rotateAnglePerFrame: 6
   rotateRadius: 0.6
   chaseSpeed: 0.2
@@ -6914,8 +6915,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: -1.3372784, y: -6.050599, z: 0}
-    m_Extent: {x: 28.042847, y: 3.0506716, z: 0}
+    m_Center: {x: -1.3372784, y: -6.050597, z: 0}
+    m_Extent: {x: 28.042847, y: 3.0506732, z: 0}
   m_SpriteSortPoint: 0
 --- !u!4 &1616148715 stripped
 Transform:
@@ -7292,6 +7293,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Trigger_Player_Idle
       objectReference: {fileID: 0}
+    - target: {fileID: 6308112947548398716, guid: 55eafb37f6c74b44e927b1382d07006a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6384323488971203746, guid: 55eafb37f6c74b44e927b1382d07006a, type: 3}
       propertyPath: m_LocalScale.x
       value: 7.45
@@ -7590,8 +7595,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 4.164034, y: 3.2179751, z: 0}
-    m_Extent: {x: 8.413763, y: 5.5317564, z: 0}
+    m_Center: {x: 4.164034, y: 3.217976, z: 0}
+    m_Extent: {x: 8.413763, y: 5.531755, z: 0}
   m_SpriteSortPoint: 0
 --- !u!1 &1872564591
 GameObject:

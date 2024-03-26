@@ -20,8 +20,8 @@ public class InteractiveBall : MonoBehaviour
 
     public GameObject player;
     private ObservableValue<STATE,InteractiveBall> state;
+    [SerializeField]
     private bool forcedByTrigger = false;
-    private bool canChangeState = true;
 
     [SerializeField][Header("每一帧旋转角度")]
     private float rotateAnglePerFrame;
@@ -95,7 +95,6 @@ public class InteractiveBall : MonoBehaviour
             return;
         if (Input.GetKeyDown(KeyCode.E))
         {
-            canChangeState = true;
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             target = new(mousePos.x, mousePos.y, 0f);
             state.Value = STATE.followingMouse;
