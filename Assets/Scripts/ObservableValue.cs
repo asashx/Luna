@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
-
+[Serializable]
 public class ObservableValue<T,TCLASS>
 {
+    [SerializeField]
     private T value;
     //private readonly string valueType;
     private readonly TCLASS valueClass;
@@ -55,9 +56,10 @@ public class ObservableValue<T,TCLASS>
         //}
 
 
-        if(valueClass is InteractiveBall)
+        if (valueClass is InteractiveBall)
+        {
+            ((InteractiveBall)((object)valueClass)).OnExitState((InteractiveBall.STATE)(object)oldValue);
             ((InteractiveBall)((object)valueClass)).OnEnterState((InteractiveBall.STATE)(object)newValue);
-
-        //refresh
+        }
     }
 }

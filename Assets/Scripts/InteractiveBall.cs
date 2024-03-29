@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class InteractiveBall : MonoBehaviour
 {
@@ -19,6 +21,7 @@ public class InteractiveBall : MonoBehaviour
     }
 
     public GameObject player;
+    [SerializeField]
     private ObservableValue<STATE,InteractiveBall> state;
     [SerializeField]
     private bool forcedByTrigger = false;
@@ -95,8 +98,8 @@ public class InteractiveBall : MonoBehaviour
             return;
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            target = new(mousePos.x, mousePos.y, 0f);
+            //Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //target = new(mousePos.x, mousePos.y, 0f);
             state.Value = STATE.followingMouse;
         }
     }
@@ -121,7 +124,7 @@ public class InteractiveBall : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             //canChangeState = true;
-            target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
+            //target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
             state.Value = STATE.chasingPlayer;
         }
     }
@@ -135,10 +138,13 @@ public class InteractiveBall : MonoBehaviour
     void ChasePlayer()
     {
         target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
-        if (!IsNear())
-            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        if (!IsNearTarget())
+        {
+            NavTowards(target, chaseSpeed);
+            //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+            return;
+        }
         else
-            
             state.Value = STATE.rotatingAroundPlayer;
     }
     //followingMouse×´Ì¬£ºÏòtargetÒÆ¶¯£¬µ½´ïºó±£³ÖfollowingMouse×´Ì¬
@@ -146,45 +152,42 @@ public class InteractiveBall : MonoBehaviour
     {
         transform.rotation = Quaternion.identity;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        target = new(mousePos.x,mousePos.y,0f);
-        transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        NavTowards(new(mousePos.x, mousePos.y, 0f), chaseSpeed);
+        //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
     }
     void Idle()
     {
         //上下浮动
-        transform.position = new Vector3(transform.position.x, transform.position.y + Mathf.Sin(Time.time) * 0.01f, transform.position.z);
+        transform.position = new Vector3(transform.position.x, transform.position.y + Mathf.Sin(Time.time) * 0.04f, transform.position.z);
     }
-    //距离小于等于nearDistance时返回true
     void GoOnTrail()
     {
-        //Debug.Log(index_lastStation);
-        target = list_passStations[index_lastStation+1].transform.position;
-        if(IsNear())
+        if(index_lastStation != -1 && IsNearTarget())
         {
             index_lastStation++;
             if (index_lastStation == list_passStations.Count - 1)
                 state.Value = STATE.Idling;
+            return;
         }
-        else
+        if (index_lastStation + 1 >= list_passSpeed.Count)
         {
-            if(index_lastStation + 1 >= list_passSpeed.Count)
-                transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
-            else
-                transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
+            NavTowards(list_passStations[index_lastStation + 1].transform.position, chaseSpeed);
+            //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+            return;
         }
+        NavTowards(list_passStations[index_lastStation + 1].transform.position, list_passSpeed[index_lastStation + 1]);
+        //transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
     }
     void GuildAhead()
     {
-        target = player.transform.position + (Vector3)delta_ahead;
         //if (IsNear())
         //    Idle();
         //else
-            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        NavTowards(player.transform.position + (Vector3)delta_ahead, chaseSpeed);
     }
-    bool IsNear()
+    bool IsNearTarget()
     {
-
-        if ((transform.position - target).magnitude <= nearDistance)
+        if (((Vector2)transform.position - (Vector2)target).magnitude <= nearDistance)
             return true;
         return false;
     }
@@ -234,16 +237,33 @@ public class InteractiveBall : MonoBehaviour
         }
         return true;
     }
-    
+    public void OnExitState(STATE state)
+    {
+        switch (state)
+        {
+            case STATE.rotatingAroundPlayer:
+                GetComponent<NavMeshAgent>().enabled = true;
+                break;
+            default:
+                break;
+        }
+    }
     public void OnEnterState(STATE state)
     {
         switch (state)
         {
             case STATE.rotatingAroundPlayer:
                 rotateAngle = 0f;
+                GetComponent<NavMeshAgent>().enabled = false;
                 break;
             default:
                 break;
         }
+    }
+
+    void NavTowards(Vector3 t, float s)
+    {
+        target = t;
+        GetComponent<TestNav>().SetTargetAndSpeed(t,s);
     }
 }
