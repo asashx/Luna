@@ -162,21 +162,25 @@ public class InteractiveBall : MonoBehaviour
     }
     void GoOnTrail()
     {
-        if(index_lastStation != -1 && IsNearTarget())
-        {
-            index_lastStation++;
-            if (index_lastStation == list_passStations.Count - 1)
-                state.Value = STATE.Idling;
-            return;
-        }
+
         if (index_lastStation + 1 >= list_passSpeed.Count)
         {
             NavTowards(list_passStations[index_lastStation + 1].transform.position, chaseSpeed);
             //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
-            return;
         }
-        NavTowards(list_passStations[index_lastStation + 1].transform.position, list_passSpeed[index_lastStation + 1]);
-        //transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
+        else
+        {
+            NavTowards(list_passStations[index_lastStation + 1].transform.position, list_passSpeed[index_lastStation + 1]);
+            //transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
+        }
+        if (/*index_lastStation != -1 && */IsNearTarget())
+        {
+            index_lastStation++;
+            if (index_lastStation == list_passStations.Count - 1)
+            {
+                state.Value = STATE.Idling;
+            }
+        }
     }
     void GuildAhead()
     {
@@ -192,31 +196,31 @@ public class InteractiveBall : MonoBehaviour
         return false;
     }
 
-    public bool HandleTrigger(MyTrigger myTrigger)
+    public bool HandleTrigger(MyTriggerBase myTrigger)
     {
         Debug.Log(myTrigger.enterType + " Enter :" + myTrigger.effectType);
-        if(myTrigger.effectType == MyTrigger.EffectType.None)
+        if(myTrigger.effectType == MyTriggerBase.EffectType.None)
         {
             forcedByTrigger = false;
             return true;
         }
-        if (myTrigger.enterType == MyTrigger.EnterType.Ball && state.Value == STATE.followingMouse)
+        if (myTrigger.enterType == MyTriggerBase.EnterType.Ball && state.Value == STATE.followingMouse)
             return false;
         forcedByTrigger = true;
         switch (myTrigger.effectType)
         {
-            case MyTrigger.EffectType.GuildAhead:
+            case MyTriggerBase.EffectType.GuildAhead:
                 delta_ahead = myTrigger.delta_ahead;
                 state.Value = STATE.GuildingAhead;
                 break;
-            case MyTrigger.EffectType.ChasePlayer:
+            case MyTriggerBase.EffectType.ChasePlayer:
                 forcedByTrigger = false;
                 state.Value = STATE.chasingPlayer;
                 break;
-            case MyTrigger.EffectType.Idle:
+            case MyTriggerBase.EffectType.Idle:
                 state.Value = STATE.Idling;
                 break;
-            case MyTrigger.EffectType.OnTrail:
+            case MyTriggerBase.EffectType.OnTrail:
                 list_passStations.Clear();
                 //深拷贝
                 for (int i=0;i<myTrigger.list_passStations.Count;i++)
@@ -264,6 +268,7 @@ public class InteractiveBall : MonoBehaviour
     void NavTowards(Vector3 t, float s)
     {
         target = t;
-        GetComponent<TestNav>().SetTargetAndSpeed(t,s);
+        transform.position = Vector3.MoveTowards(transform.position, t, s);
+        //GetComponent<TestNav>().SetTargetAndSpeed(t,s);
     }
 }

@@ -4,15 +4,14 @@ using System.ComponentModel;
 using UnityEngine;
 
 
-public class MyTrigger : MonoBehaviour
+public class MyTriggerBase : MonoBehaviour
 {
     [Header("可视")]
     public bool visable;
-
     [Header("只使用一次")]
     public bool usedOnce;
-    [SerializeField][Header("是否已使用")]
-    private bool used = false;
+    [Header("是否已使用")]
+    public bool used = false;
     public enum EnterType
     {
         Player,
@@ -41,20 +40,8 @@ public class MyTrigger : MonoBehaviour
     [Tooltip("每站之间的速度")]public List<float> list_passSpeed = new();
 
     
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (used)
-            return;
-        if(collision.CompareTag("Player") && enterType == EnterType.Player)
-        {
-            CallHandleTrigger();
-        }
-        if (collision.CompareTag("Ball") && enterType == EnterType.Ball)
-        {
-            CallHandleTrigger();
-        }
-    }
-    void CallHandleTrigger()
+    
+    public void CallHandleTrigger()
     {
         bool whetherUse = InteractiveBall.Instance.HandleTrigger(this);
         if (usedOnce && whetherUse)
@@ -79,7 +66,7 @@ public class MyTrigger : MonoBehaviour
     {
         #region visable
         PassStations = transform.Find("PassStations").gameObject;
-        GetComponent<SpriteRenderer>().enabled = visable;
+        transform.Find("Enter").GetComponent<SpriteRenderer>().enabled = visable;
         for (int i = 0; i < PassStations.transform.childCount; i++)
         {
             PassStations.transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = visable;

@@ -12,9 +12,10 @@ public class TestNav : MonoBehaviour
     public NavMeshSurface navMeshSurface;
     private void Awake()
     {
+        return;
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.updateRotation = navMeshAgent.updateUpAxis = false;
-        //StartCoroutine(RefreshSurface());
+        StartCoroutine(RefreshSurface());
         
     }
     private void Update()
@@ -37,6 +38,5 @@ public class TestNav : MonoBehaviour
     {
         navMeshAgent.SetDestination(tar);
         navMeshAgent.speed = s;
-        print(navMeshAgent.velocity);
     }
 }
