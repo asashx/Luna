@@ -10,9 +10,9 @@ public class TestNav : MonoBehaviour
     //[SerializeField]Transform target;
     NavMeshAgent navMeshAgent;
     public NavMeshSurface navMeshSurface;
+    public BackNav backNav;
     private void Awake()
     {
-        return;
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.updateRotation = navMeshAgent.updateUpAxis = false;
         StartCoroutine(RefreshSurface());
@@ -27,6 +27,7 @@ public class TestNav : MonoBehaviour
         while(true)
         {
             yield return new WaitForSeconds(0.500f);
+            backNav.RefreshBackAccessible();
             navMeshSurface.BuildNavMesh();
         }
     }

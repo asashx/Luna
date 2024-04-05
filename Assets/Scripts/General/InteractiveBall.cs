@@ -245,8 +245,8 @@ public class InteractiveBall : MonoBehaviour
     {
         switch (state)
         {
-            case STATE.rotatingAroundPlayer:
-                GetComponent<NavMeshAgent>().enabled = true;
+            case STATE.followingMouse:
+                GetComponent<NavMeshAgent>().enabled = false;
                 break;
             default:
                 break;
@@ -256,9 +256,9 @@ public class InteractiveBall : MonoBehaviour
     {
         switch (state)
         {
-            case STATE.rotatingAroundPlayer:
+            case STATE.followingMouse:
                 rotateAngle = 0f;
-                GetComponent<NavMeshAgent>().enabled = false;
+                GetComponent<NavMeshAgent>().enabled = true;
                 break;
             default:
                 break;

@@ -1,19 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class TriggerManager : MonoBehaviour
+public class TriggerManager : Singleton<TriggerManager>
 {
-    public static TriggerManager Instance { get; private set; }
     [Header("全部可视")]
     public bool allVisable;
     //[HideInInspector]
     public List<MyTriggerBase> existing_triggers = new();
-    private void Awake()
-    {
-        Instance = this;
-    }
-
     void Initialize()
     {
         existing_triggers.Clear();
