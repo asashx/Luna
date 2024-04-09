@@ -151,7 +151,7 @@ public class InteractiveBall : MonoBehaviour
     {
         transform.rotation = Quaternion.identity;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        NavTowards(new(mousePos.x, mousePos.y, 0f), chaseSpeed);
+        MoveTowards(new(mousePos.x, mousePos.y, 0f), chaseSpeed);
         //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
     }
     void Idle()
@@ -250,6 +250,7 @@ public class InteractiveBall : MonoBehaviour
         switch (state)
         {
             case STATE.followingMouse:
+            case STATE.chasingPlayer:
                 GetComponent<NavMeshAgent>().enabled = false;
                 break;
             default:
@@ -261,6 +262,7 @@ public class InteractiveBall : MonoBehaviour
         switch (state)
         {
             case STATE.followingMouse:
+            case STATE.chasingPlayer:
                 rotateAngle = 0f;
                 GetComponent<NavMeshAgent>().enabled = true;
                 break;
@@ -271,8 +273,10 @@ public class InteractiveBall : MonoBehaviour
 
     void NavTowards(Vector3 t, float s)
     {
-        target = t;
+        GetComponent<TestNav>().SetTargetAndSpeed(t,s*80);
+    }
+    void MoveTowards(Vector3 t, float s)
+    {
         transform.position = Vector3.MoveTowards(transform.position, t, s);
-        //GetComponent<TestNav>().SetTargetAndSpeed(t,s);
     }
 }
