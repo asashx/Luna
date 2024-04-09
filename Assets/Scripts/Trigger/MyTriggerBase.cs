@@ -6,11 +6,11 @@ using UnityEngine;
 
 public class MyTriggerBase : MonoBehaviour
 {
-    [Header("可视")]
+    [Label("可视")]
     public bool visable;
-    [Header("只使用一次")]
+    [Label("只使用一次")]
     public bool usedOnce;
-    [Header("是否已使用")]
+    [Label("是否已使用")]
     public bool used = false;
     public enum EnterType
     {
@@ -29,15 +29,15 @@ public class MyTriggerBase : MonoBehaviour
     public EffectType effectType;
 
     [Header("GuildAhead")]
-    [Tooltip("带领玩家时的位移偏移")] public Vector2 delta_ahead;
+    [Label("带领玩家时的位移偏移")] public Vector2 delta_ahead;
 
 
     [HideInInspector]
     public GameObject PassStations;
     [HideInInspector]
-    [Tooltip("途径站点")] public List<GameObject> list_passStations;
+    [Label("途径站点")] public List<GameObject> list_passStations;
     [Header("Ontrail")]
-    [Tooltip("每站之间的速度")]public List<float> list_passSpeed = new();
+    [Label("每站之间的速度")]public List<float> list_passSpeed = new();
 
     
     
