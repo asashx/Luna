@@ -4,15 +4,14 @@ using System.ComponentModel;
 using UnityEngine;
 
 
-public class MyTrigger : MonoBehaviour
+public class MyTriggerBase : MonoBehaviour
 {
-    [Header("¿ÉÊÓ")]
+    [Header("å¯è§†")]
     public bool visable;
-
-    [Header("ÊÇ·ñÖ»´¥·¢Ò»´Î")]
+    [Header("åªä½¿ç”¨ä¸€æ¬¡")]
     public bool usedOnce;
-    [SerializeField][Header("ÊÇ·ñÒÑ¾­´¥·¢¹ı")]
-    private bool used = false;
+    [Header("æ˜¯å¦å·²ä½¿ç”¨")]
+    public bool used = false;
     public enum EnterType
     {
         Player,
@@ -21,40 +20,28 @@ public class MyTrigger : MonoBehaviour
     public EnterType enterType;
     public enum EffectType
     {
-        None,//ÎŞĞ§¹û
-        GuildAhead,//ÒıÁìÍæ¼ÒÇ°½ø
-        ChasePlayer,//¸úËæÍæ¼Ò
-        Idle,//Í£ÔÚÔ­µØ
-        OnTrail,//°´ÕÕ¼È¶¨¹ì¼£Ç°½ø
+        None,           //???
+        GuildAhead,     //??????
+        ChasePlayer,    //????
+        Idle,           //????
+        OnTrail,        //????????
     }
     public EffectType effectType;
 
     [Header("GuildAhead")]
-    [Tooltip("ÀëÍæ¼ÒµÄÏà¶Ô×ø±ê")] public Vector2 delta_ahead;
+    [Tooltip("å¸¦é¢†ç©å®¶æ—¶çš„ä½ç§»åç§»")] public Vector2 delta_ahead;
 
 
     [HideInInspector]
     public GameObject PassStations;
     [HideInInspector]
-    /*[Tooltip("¼È¶¨¹ì¼£µÄÖĞ¼äÕ¾µã")] */public List<GameObject> list_passStations;
+    [Tooltip("é€”å¾„ç«™ç‚¹")] public List<GameObject> list_passStations;
     [Header("Ontrail")]
-    [Tooltip("Õ¾µã¼äµÄÒÆ¶¯ËÙ¶È")]public List<float> list_passSpeed = new();
+    [Tooltip("æ¯ç«™ä¹‹é—´çš„é€Ÿåº¦")]public List<float> list_passSpeed = new();
 
     
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (used)
-            return;
-        if(collision.CompareTag("Player") && enterType == EnterType.Player)
-        {
-            CallHandleTrigger();
-        }
-        if (collision.CompareTag("Ball") && enterType == EnterType.Ball)
-        {
-            CallHandleTrigger();
-        }
-    }
-    void CallHandleTrigger()
+    
+    public void CallHandleTrigger()
     {
         bool whetherUse = InteractiveBall.Instance.HandleTrigger(this);
         if (usedOnce && whetherUse)
@@ -79,11 +66,10 @@ public class MyTrigger : MonoBehaviour
     {
         #region visable
         PassStations = transform.Find("PassStations").gameObject;
-        GetComponent<SpriteRenderer>().enabled = visable;
+        transform.Find("Enter").GetComponent<SpriteRenderer>().enabled = visable;
         for (int i = 0; i < PassStations.transform.childCount; i++)
         {
-            GameObject child = PassStations.transform.GetChild(i).gameObject;
-            child.GetComponent<SpriteRenderer>().enabled = visable;
+            PassStations.transform.GetChild(i).GetComponent<SpriteRenderer>().enabled = visable;
         }
         #endregion
 
@@ -93,19 +79,9 @@ public class MyTrigger : MonoBehaviour
 
         #region onTrail
         if (effectType == EffectType.OnTrail)
-        {
             PassStations.SetActive(true);
-            
-        }
         else
             PassStations.SetActive(false);
         #endregion
-
-
-        //AttributeCollection collection = TypeDescriptor.GetAttributes(list_passSpeed,false);
-        //Debug.Log(collection[0]);
-        //Debug.Log(collection[1]);
-        //Debug.Log(collection[2]);
-        //Debug.Log(collection[3]);
     }
 }

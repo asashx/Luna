@@ -1,6 +1,8 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class InteractiveBall : MonoBehaviour
 {
@@ -8,32 +10,33 @@ public class InteractiveBall : MonoBehaviour
 
     public enum STATE
     {   
-        none,                   //²»ÒÆ¶¯
-        rotatingAroundPlayer,   //Î§ÈÆÍæ¼ÒĞı×ª
-        chasingPlayer,          //»Øµ½Íæ¼ÒÉí±ßµÄ¹ı³ÌÖĞ
-        followingMouse,         //¸úËæÊó±ê
+        none,                   //å®Œå…¨é™æ­¢
+        rotatingAroundPlayer,   //å›´ç»•ç©å®¶æ—‹è½¬
+        chasingPlayer,          //å›åˆ°ç©å®¶èº«è¾¹çš„è¿‡ç¨‹ä¸­
+        followingMouse,         //è·Ÿéšé¼ æ ‡
 
-        Idling,                 //Ô­µØ´ı»ú
-        GuildingAhead,          //ÒıÁìÍæ¼ÒÇ°½ø
-        OnTrail,                //°´ÕÕ¼È¶¨¹ì¼£Ç°½ø
+        Idling,                 //åŸåœ°å¾…æœº
+        GuildingAhead,          //å¼•é¢†ç©å®¶å‰è¿›
+        OnTrail,                //æŒ‰ç…§æ—¢å®šè½¨è¿¹å‰è¿›
     }
 
     public GameObject player;
+    [SerializeField]
     private ObservableValue<STATE,InteractiveBall> state;
+    [SerializeField]
     private bool forcedByTrigger = false;
-    private bool canChangeState = true;
 
-    [SerializeField][Header("Ã¿Ò»Ö¡Ğı×ª½Ç¶È")]
+    [SerializeField][Header("æ¯ä¸€å¸§æ—‹è½¬è§’åº¦")]
     private float rotateAnglePerFrame;
     private float rotateAngle = 0f;
-    [SerializeField][Header("Ğı×ª°ë¾¶")]
+    [SerializeField][Header("æ—‹è½¬åŠå¾„")]
     private float rotateRadius;
 
-    //[Header("ÕıÔÚ×·ËæµÄÄ¿±ê")]
+    //[Header("æ­£åœ¨è¿½éšçš„ç›®æ ‡")]
     private Vector3 target;
-    //[Header("Ğ¡ÓÚÕâ¸öÖµÅĞ¶¨ÎªÒÑ½Ó½ü")]
+    //[Header("å°äºè¿™ä¸ªå€¼åˆ¤å®šä¸ºå·²æ¥è¿‘")]
     private float nearDistance = 0.01f;
-    [SerializeField][Header("×·ËæËÙ¶È")]
+    [SerializeField][Header("è¿½éšé€Ÿåº¦")]
     private float chaseSpeed;
 
     private int index_lastStation = -1;
@@ -95,9 +98,8 @@ public class InteractiveBall : MonoBehaviour
             return;
         if (Input.GetKeyDown(KeyCode.E))
         {
-            canChangeState = true;
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            target = new(mousePos.x, mousePos.y, 0f);
+            //Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //target = new(mousePos.x, mousePos.y, 0f);
             state.Value = STATE.followingMouse;
         }
     }
@@ -105,7 +107,7 @@ public class InteractiveBall : MonoBehaviour
     //{
     //    if (forcedByTrigger)
     //        return;
-    //    //°´ÏÂEÊ±£¬ÇĞ»»target
+    //    //æŒ‰ä¸‹Eæ—¶ï¼Œåˆ‡æ¢target
     //    if (Input.GetKeyDown(KeyCode.E))
     //    {
     //        //canChangeState = true;
@@ -118,11 +120,11 @@ public class InteractiveBall : MonoBehaviour
     {
         if (forcedByTrigger)
             return;
-        //°´ÏÂEÊ±£¬ÇĞ»»target
+        //æŒ‰ä¸‹Eæ—¶ï¼Œåˆ‡æ¢target
         if (Input.GetKeyDown(KeyCode.E))
         {
             //canChangeState = true;
-            target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
+            //target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
             state.Value = STATE.chasingPlayer;
         }
     }
@@ -132,92 +134,96 @@ public class InteractiveBall : MonoBehaviour
         transform.position = new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
             player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad));
     }
-    //chasingPlayer×´Ì¬£ºÏòtargetÒÆ¶¯£¬µ½´ïºóÇĞ»»µ½rotatingAroundPlayer×´Ì¬
+    //chasingPlayerçŠ¶æ€ï¼šå‘targetç§»åŠ¨ï¼Œåˆ°è¾¾ååˆ‡æ¢åˆ°rotatingAroundPlayerçŠ¶æ€
     void ChasePlayer()
     {
         target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
-        if (!IsNear())
-            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        if (!IsNearTarget())
+        {
+            NavTowards(target, chaseSpeed);
+            //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+            return;
+        }
         else
-            
             state.Value = STATE.rotatingAroundPlayer;
     }
-    //followingMouse×´Ì¬£ºÏòtargetÒÆ¶¯£¬µ½´ïºó±£³ÖfollowingMouse×´Ì¬
+    //followingMouseÃ—Â´ÃŒÂ¬Â£ÂºÃÃ²targetÃ’Ã†Â¶Â¯Â£Â¬ÂµÂ½Â´Ã¯ÂºÃ³Â±Â£Â³Ã–followingMouseÃ—Â´ÃŒÂ¬
     void FollowMouse()
     {
         transform.rotation = Quaternion.identity;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        target = new(mousePos.x,mousePos.y,0f);
-        transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        NavTowards(new(mousePos.x, mousePos.y, 0f), chaseSpeed);
+        //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
     }
     void Idle()
     {
-        //ÉÏÏÂ¸¡¶¯
-        transform.position = new Vector3(transform.position.x, transform.position.y + Mathf.Sin(Time.time) * 0.01f, transform.position.z);
+        //ä¸Šä¸‹æµ®åŠ¨
+        transform.position = new Vector3(transform.position.x, transform.position.y + Mathf.Sin(Time.time) * 0.04f, transform.position.z);
     }
-    //¾àÀëĞ¡ÓÚµÈÓÚnearDistanceÊ±·µ»Øtrue
     void GoOnTrail()
     {
-        //Debug.Log(index_lastStation);
-        target = list_passStations[index_lastStation+1].transform.position;
-        if(IsNear())
+
+        if (index_lastStation + 1 >= list_passSpeed.Count)
         {
-            index_lastStation++;
-            if (index_lastStation == list_passStations.Count - 1)
-                state.Value = STATE.Idling;
+            NavTowards(list_passStations[index_lastStation + 1].transform.position, chaseSpeed);
+            //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
         }
         else
         {
-            if(index_lastStation + 1 >= list_passSpeed.Count)
-                transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
-            else
-                transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
+            NavTowards(list_passStations[index_lastStation + 1].transform.position, list_passSpeed[index_lastStation + 1]);
+            //transform.position = Vector3.MoveTowards(transform.position, target, list_passSpeed[index_lastStation + 1]);
+        }
+        if (/*index_lastStation != -1 && */IsNearTarget())
+        {
+            index_lastStation++;
+            if (index_lastStation == list_passStations.Count - 1)
+            {
+                state.Value = STATE.Idling;
+            }
         }
     }
     void GuildAhead()
     {
-        target = player.transform.position + (Vector3)delta_ahead;
         //if (IsNear())
         //    Idle();
         //else
-            transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
+        NavTowards(player.transform.position + (Vector3)delta_ahead, chaseSpeed);
     }
-    bool IsNear()
+    bool IsNearTarget()
     {
-
-        if ((transform.position - target).magnitude <= nearDistance)
+        if (((Vector2)transform.position - (Vector2)target).magnitude <= nearDistance)
             return true;
         return false;
     }
 
-    public bool HandleTrigger(MyTrigger myTrigger)
+    public bool HandleTrigger(MyTriggerBase myTrigger)
     {
         Debug.Log(myTrigger.enterType + " Enter :" + myTrigger.effectType);
-        if(myTrigger.effectType == MyTrigger.EffectType.None)
+        if(myTrigger.effectType == MyTriggerBase.EffectType.None)
         {
             forcedByTrigger = false;
             return true;
         }
-        if (myTrigger.enterType == MyTrigger.EnterType.Ball && state.Value == STATE.followingMouse)
+        if (myTrigger.enterType == MyTriggerBase.EnterType.Ball && state.Value == STATE.followingMouse)
             return false;
         forcedByTrigger = true;
         switch (myTrigger.effectType)
         {
-            case MyTrigger.EffectType.GuildAhead:
+            case MyTriggerBase.EffectType.GuildAhead:
                 delta_ahead = myTrigger.delta_ahead;
                 state.Value = STATE.GuildingAhead;
                 break;
-            case MyTrigger.EffectType.ChasePlayer:
+            case MyTriggerBase.EffectType.ChasePlayer:
                 forcedByTrigger = false;
                 state.Value = STATE.chasingPlayer;
                 break;
-            case MyTrigger.EffectType.Idle:
+            case MyTriggerBase.EffectType.Idle:
                 state.Value = STATE.Idling;
                 break;
-            case MyTrigger.EffectType.OnTrail:
+            case MyTriggerBase.EffectType.OnTrail:
                 list_passStations.Clear();
-                //Éî¿½±´
-                for(int i=0;i<myTrigger.list_passStations.Count;i++)
+                //æ·±æ‹·è´
+                for (int i=0;i<myTrigger.list_passStations.Count;i++)
                 {
                     list_passStations.Add(myTrigger.list_passStations[i]);
                 }
@@ -235,16 +241,34 @@ public class InteractiveBall : MonoBehaviour
         }
         return true;
     }
-    
-    public void OnEnterState(STATE state)
+    public void OnExitState(STATE state)
     {
         switch (state)
         {
-            case STATE.rotatingAroundPlayer:
-                rotateAngle = 0f;
+            case STATE.followingMouse:
+                GetComponent<NavMeshAgent>().enabled = false;
                 break;
             default:
                 break;
         }
+    }
+    public void OnEnterState(STATE state)
+    {
+        switch (state)
+        {
+            case STATE.followingMouse:
+                rotateAngle = 0f;
+                GetComponent<NavMeshAgent>().enabled = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    void NavTowards(Vector3 t, float s)
+    {
+        target = t;
+        transform.position = Vector3.MoveTowards(transform.position, t, s);
+        //GetComponent<TestNav>().SetTargetAndSpeed(t,s);
     }
 }
