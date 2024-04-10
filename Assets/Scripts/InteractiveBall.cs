@@ -130,14 +130,14 @@ public class InteractiveBall : MonoBehaviour
     void RotateAroundPlayer()
     {
         rotateAngle += rotateAnglePerFrame;
-        transform.position = new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
-            player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad));
+        MoveTowards(new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
+            player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad)), chaseSpeed);
     }
     //chasingPlayer状态：向target移动，到达后切换到rotatingAroundPlayer状态
     void ChasePlayer()
     {
-        target = player.transform.position + new Vector3(rotateRadius, 0f, 0f);
-        if (!IsNearTarget())
+        target = player.transform.position/* + new Vector3(rotateRadius, 0f, 0f)*/;
+        if (!IsNearTarget(nearDistance * 20))
         {
             NavTowards(target, chaseSpeed);
             //transform.position = Vector3.MoveTowards(transform.position, target, chaseSpeed);
@@ -188,13 +188,14 @@ public class InteractiveBall : MonoBehaviour
         //else
         NavTowards(player.transform.position + (Vector3)delta_ahead, chaseSpeed);
     }
-    bool IsNearTarget()
+    bool IsNearTarget(float f_nearDistance = -1f)
     {
-        if (((Vector2)transform.position - (Vector2)target).magnitude <= nearDistance)
+        if (f_nearDistance == -1f)
+            f_nearDistance = nearDistance;
+        if (((Vector2)transform.position - (Vector2)target).magnitude <= f_nearDistance)
             return true;
         return false;
     }
-
     public bool HandleTrigger(MyTriggerBase myTrigger)
     {
         Debug.Log(myTrigger.enterType + " Enter :" + myTrigger.effectType);
@@ -251,6 +252,7 @@ public class InteractiveBall : MonoBehaviour
         {
             case STATE.followingMouse:
             case STATE.chasingPlayer:
+            case STATE.OnTrail:
                 GetComponent<NavMeshAgent>().enabled = false;
                 break;
             default:
@@ -263,7 +265,8 @@ public class InteractiveBall : MonoBehaviour
         {
             case STATE.followingMouse:
             case STATE.chasingPlayer:
-                rotateAngle = 0f;
+            case STATE.OnTrail:
+                rotateAngle = Random.Range(0,360f);
                 GetComponent<NavMeshAgent>().enabled = true;
                 break;
             default:
