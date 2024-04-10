@@ -130,6 +130,11 @@ public class InteractiveBall : MonoBehaviour
     void RotateAroundPlayer()
     {
         rotateAngle += rotateAnglePerFrame;
+        if(!IsNearTarget(rotateRadius * 2f))
+        {
+            state.Value = STATE.chasingPlayer;
+            return;
+        }
         MoveTowards(new Vector3(player.transform.position.x + rotateRadius * Mathf.Cos(rotateAngle * Mathf.Deg2Rad),
             player.transform.position.y, player.transform.position.z - rotateRadius * Mathf.Sin(rotateAngle * Mathf.Deg2Rad)), chaseSpeed);
     }

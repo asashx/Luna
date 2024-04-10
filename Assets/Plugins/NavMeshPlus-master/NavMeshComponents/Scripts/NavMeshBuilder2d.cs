@@ -31,6 +31,7 @@ namespace NavMeshPlus.Extensions
 
         public IEnumerable<GameObject> Root => _root ?? GetRoot();
 
+        
         public NavMeshBuilder2dState()
         {
             spriteMeshMap = new Dictionary<Sprite, Mesh>();
@@ -53,7 +54,161 @@ namespace NavMeshPlus.Extensions
             }
             return mesh;
         }
+        static GameObject p = new();
+        /*
+            InsideTriangle decides if a point P is Inside of the triangle
+            defined by A, B, C.
+        */
+        static bool InsideTriangle(float Ax, float Ay,
+                              float Bx, float By,
+                              float Cx, float Cy,
+                              float Px, float Py)
+        {
+            float ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
+            float cCROSSap, bCROSScp, aCROSSbp;
 
+            ax = Cx - Bx; ay = Cy - By;
+            bx = Ax - Cx; by = Ay - Cy;
+            cx = Bx - Ax; cy = By - Ay;
+            apx = Px - Ax; apy = Py - Ay;
+            bpx = Px - Bx; bpy = Py - By;
+            cpx = Px - Cx; cpy = Py - Cy;
+
+            aCROSSbp = ax * bpy - ay * bpx;
+            cCROSSap = cx * apy - cy * apx;
+            bCROSScp = bx * cpy - by * cpx;
+
+            return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
+        }
+        struct Vertex2D
+        {
+            public Vector3 point;
+            public int index;
+        }
+        static bool IsLeftSide(Vector3 p1,Vector3 p2,Vector3 p3,Vector3 p4, bool dir = true)//判断点3指向点4的向量在点1指向点2的向量的哪侧
+        {
+            float x1 = p1.x;
+            float y1 = p1.y;
+            float x2 = p2.x;
+            float y2 = p2.y;
+            float x3 = p3.x;
+            float y3 = p3.y;
+            float x4 = p4.x;
+            float y4 = p4.y;
+            float ax = x2 - x1;
+            float ay = y2 - y1;
+            float bx = x4 - x3;
+            float by = y4 - y3;
+            //向量(ax,ay,0)叉乘向量(bx,by,0)得到的向量为(0,0,ab),由ab的正负和观察方向界定左右
+            float ab = (ax * by - ay * bx);
+            //
+            bool? side = null;
+            if (ab == 0)
+            {
+                side = true;//共线或者平行
+            }
+            else if (ab > 0)
+            {
+                if (dir)
+                {
+                    side = true;
+                }
+                else //dir=1
+                {
+                    side = false;
+                }
+
+            }
+            else if (ab < 0)
+            {
+                if (dir)
+                {
+                    side = false;
+                }
+                else //dir=1
+                {
+                    side = true;
+                }
+            }
+            return side.Value;
+        }
+        static int[] triangulate_earClip(Vector3[] points)
+        {
+            LinkedList<Vertex2D> remainVertexs = new();
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vertex2D vertex = new()
+                {
+                    point = points[i],
+                    index = i,
+                };
+                remainVertexs.AddLast(vertex);
+            }
+
+            List<int> indices = new();
+            LinkedListNode<Vertex2D> previousNode = remainVertexs.First;
+            LinkedListNode<Vertex2D> node = previousNode.Next;
+            LinkedListNode<Vertex2D> nextNode = node.Next;
+            int c = 0;
+            while (remainVertexs.Count > 3 && c < 1e5)
+            {
+                c++;
+                //Debug.Log("remainVertexs = " + remainVertexs.Count);
+                Vector3 p0 = previousNode.Value.point;
+                Vector3 p1 = node.Value.point;
+                Vector3 p2 = nextNode.Value.point;
+                if (IsLeftSide(p0, p1,p0, p2))
+                {
+                    bool isEar = true;
+                    for (LinkedListNode<Vertex2D> n = (nextNode.Next != remainVertexs.Last) ? nextNode.Next : remainVertexs.First;
+                        n != previousNode;
+                        n = (n.Next != remainVertexs.Last) ? n.Next : remainVertexs.First)
+                    {
+                        if (InsideTriangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, n.Value.point.x, n.Value.point.y))
+                        {
+                            isEar = false;
+                            break;
+                        }
+                    }
+                    if (isEar)
+                    {
+                        //增加三角形索引和移除当前的耳朵点
+                        indices.Add(previousNode.Value.index);
+                        indices.Add(node.Value.index);
+                        indices.Add(nextNode.Value.index);
+
+                        remainVertexs.Remove(node);
+
+                        //更新当前处理的顶点
+                        node = nextNode;
+                        nextNode = (nextNode.Next != remainVertexs.Last) ? nextNode.Next : remainVertexs.First;
+                        continue;
+                    }
+                }
+                previousNode = (previousNode.Next != remainVertexs.Last) ? previousNode.Next : remainVertexs.First;
+                node = (node.Next != remainVertexs.Last) ? node.Next : remainVertexs.First;
+                nextNode = (nextNode.Next != remainVertexs.Last) ? nextNode.Next : remainVertexs.First;
+            }
+            previousNode = remainVertexs.First;
+            node = previousNode.Next;
+            nextNode = node.Next;
+
+            indices.Add(previousNode.Value.index);
+            indices.Add(node.Value.index);
+            indices.Add(nextNode.Value.index);
+            return indices.ToArray();
+        }
+        static Vector3[] V2_to_3_To_World(Vector2[] v2,Transform t)
+        {
+            Vector3[] v3 = new Vector3[v2.Length];
+            p.transform.parent = t;
+            for (int i = 0; i < v2.Length; i++)
+            {
+                p.transform.localPosition = v2[i];
+                v3[i] = p.transform.position;
+            }
+            return v3;
+        }
         public Mesh GetMesh(Collider2D collider)
         {
 #if UNITY_2019_3_OR_NEWER
@@ -66,6 +221,16 @@ namespace NavMeshPlus.Extensions
             else
             {
                 mesh = collider.CreateMesh(false, false);
+                if (collider.GetComponent<EdgeCollider2D>())
+                {
+                    mesh.vertices = V2_to_3_To_World(collider.GetComponent<EdgeCollider2D>().points, collider.transform);
+                    mesh.triangles = triangulate_earClip(mesh.vertices);
+                }
+                //for (int i = 0; i < mesh.vertices.Length; i++)
+                //{
+                //    GameObject g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                //    g.transform.position = mesh.vertices[i];
+                //}
                 coliderMeshMap.Add(hash, mesh);
             }
             return mesh;
