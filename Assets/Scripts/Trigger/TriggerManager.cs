@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class TriggerManager : Singleton<TriggerManager>
 {
-    [Header("全部可视")]
+    [Label("全部可视")]
     public bool allVisable;
     //[HideInInspector]
-    public List<MyTriggerBase> existing_triggers = new();
+    List<MyTriggerBase> existing_triggers = new();
     void Initialize()
     {
         existing_triggers.Clear();

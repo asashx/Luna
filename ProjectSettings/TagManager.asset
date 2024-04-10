@@ -4,10 +4,10 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Ground
-  - Trigger_Ball
   - Ball
   - Slope
+  - Ground
+  - Trigger_Ball
   layers:
   - Default
   - TransparentFX
@@ -44,6 +44,12 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Back
+    uniqueID: 1819391031
+    locked: 0
+  - name: Ground
+    uniqueID: 3901925233
     locked: 0
   - name: Character
     uniqueID: 2565313537
