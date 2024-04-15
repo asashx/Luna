@@ -22,7 +22,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
-  groundCheckOffset: {x: -0.01, y: -1.51}
+  groundCheckOffset: {x: 1, y: -1.51}
   slopeCheckLength: 2.6
   slopeLayer:
     serializedVersion: 2
