@@ -226,6 +226,7 @@ namespace NavMeshPlus.Extensions
                     mesh.vertices = V2_to_3_To_World(collider.GetComponent<EdgeCollider2D>().points, collider.transform);
                     mesh.triangles = triangulate_earClip(mesh.vertices);
                 }
+
                 //for (int i = 0; i < mesh.vertices.Length; i++)
                 //{
                 //    GameObject g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
