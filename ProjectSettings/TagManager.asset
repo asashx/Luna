@@ -51,6 +51,9 @@ TagManager:
   - name: Ground
     uniqueID: 3901925233
     locked: 0
+  - name: Interact
+    uniqueID: 2240666293
+    locked: 0
   - name: Character
     uniqueID: 2565313537
     locked: 0
