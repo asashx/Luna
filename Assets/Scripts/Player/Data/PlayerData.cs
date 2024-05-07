@@ -18,6 +18,7 @@ public class PlayerData : ScriptableObject
     [Header("地面检测")]
     public float groundCheckRadius = 0.1f;
     public LayerMask groundLayer;
+    public List<LayerMask> extraGroundLayers;
     public Vector2 groundCheckOffset;
 
     [Header("滑坡检测")]

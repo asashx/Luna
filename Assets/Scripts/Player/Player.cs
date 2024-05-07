@@ -26,7 +26,7 @@ public class Player : MonoBehaviour
     public Vector2 CurrentVelocity { get; private set; }
     public int FacingDirection { get; private set; } = 1;
 
-    [SerializeField] 
+    [SerializeField]
     private PlayerData playerData;
 
     private Vector2 jumpPressedPos;
@@ -119,14 +119,34 @@ public class Player : MonoBehaviour
     #region 检测函数
     // public bool CheckIfGrounded()
     // {
-    //     return Physics2D.OverlapCircle((Vector2)transform.position + playerData.groundCheckOffset, playerData.groundCheckRadius, playerData.groundLayer);
+    //     Vector2 LeftEnd = (Vector2)transform.position + playerData.groundCheckOffset;
+
+    //     return Physics2D.OverlapCapsule(LeftEnd, new Vector2(playerData.groundCheckRadius * 2,
+    //      (playerData.groundCheckRadius + playerData.groundCheckOffset.x) * 2), CapsuleDirection2D.Horizontal, 0, playerData.groundLayer);
     // }
     public bool CheckIfGrounded()
     {
-        Vector2 LeftEnd = (Vector2)transform.position + playerData.groundCheckOffset;
+        Vector2 leftEnd = (Vector2)transform.position + playerData.groundCheckOffset;
 
-        return Physics2D.OverlapCapsule(LeftEnd, new Vector2(playerData.groundCheckRadius * 2,
-         (playerData.groundCheckRadius + playerData.groundCheckOffset.x) * 2), CapsuleDirection2D.Horizontal, 0, playerData.groundLayer);
+        if (Physics2D.OverlapCapsule(leftEnd, new Vector2(playerData.groundCheckRadius * 2,
+            (playerData.groundCheckRadius + playerData.groundCheckOffset.x) * 2),
+            CapsuleDirection2D.Horizontal, 0, playerData.groundLayer))
+        {
+            return true;
+        }
+
+        // 遍历检测附加层
+        foreach (LayerMask layer in playerData.extraGroundLayers)
+        {
+            if (Physics2D.OverlapCapsule(leftEnd, new Vector2(playerData.groundCheckRadius * 2,
+                (playerData.groundCheckRadius + playerData.groundCheckOffset.x) * 2),
+                CapsuleDirection2D.Horizontal, 0, layer))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     public bool CheckSlope()
     {
@@ -156,7 +176,7 @@ public class Player : MonoBehaviour
         Gizmos.DrawWireSphere(jumpPressedPos, 0.05f);
         // 绘制悬崖检测线
         Gizmos.DrawLine(transform.position + (Vector3)playerData.ledgeCheckOffset1, transform.position + (Vector3)(playerData.ledgeCheckOffset1 + Vector2.right * FacingDirection * playerData.ledgeCheckLength));
-        Gizmos.DrawLine(transform.position + (Vector3)playerData.ledgeCheckOffset2, transform.position + (Vector3)(playerData.ledgeCheckOffset2 + Vector2.right * FacingDirection * playerData.ledgeCheckLength));     
+        Gizmos.DrawLine(transform.position + (Vector3)playerData.ledgeCheckOffset2, transform.position + (Vector3)(playerData.ledgeCheckOffset2 + Vector2.right * FacingDirection * playerData.ledgeCheckLength));
     }
     #endregion
 
