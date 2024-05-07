@@ -209,8 +209,8 @@ public class InteractiveBall : MonoBehaviour
             forcedByTrigger = false;
             return true;
         }
-        if (myTrigger.enterType == MyTriggerBase.EnterType.Ball && state.Value == STATE.followingMouse)
-            return false;
+        //if (myTrigger.enterType == MyTriggerBase.EnterType.Ball && state.Value == STATE.followingMouse)
+        //    return false;
         forcedByTrigger = true;
         switch (myTrigger.effectType)
         {
@@ -248,6 +248,7 @@ public class InteractiveBall : MonoBehaviour
     }
     void OnStateChange(STATE oldState, STATE newState)
     {
+        print("new State = " + newState);
         OnExitState(oldState);
         OnEnterState(newState);
     }
